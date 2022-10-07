@@ -1,64 +1,3 @@
-let battleScene = tilemap`level1`
-let introScene = tilemap`level5`
-let currentScene = "Battle"
-let MineSpriteKind = SpriteKind.create()
-function change_Scene(sceneName: string) {
-    if (sceneName == "Intro") {
-        tiles.setCurrentTilemap(introScene)
-        IntroSceneStart()
-    } else {
-        tiles.setCurrentTilemap(battleScene)
-        BattleSceneStart()
-    }
-    
-}
-
-function spawn_landmine() {
-    
-    landmine = sprites.create(img`
-                . . . . . . . . . . . .
-                        . . . 6 6 6 6 6 6 . . .
-                        . . 6 6 6 6 6 6 6 6 . .
-                        . 6 6 6 6 6 6 6 6 6 6 .
-                        . 6 6 6 6 6 6 2 6 6 6 .
-                        . 6 6 6 6 f f 6 6 6 6 .
-                        . 6 6 6 f f f f 6 6 6 .
-                        . 6 6 6 6 f f 6 6 6 6 .
-                        . 6 6 6 6 6 6 6 6 6 6 .
-                        . . 6 6 6 6 6 6 6 6 . .
-                        . . . 6 6 6 6 6 6 . . .
-                        . . . . . . . . . . . .
-            `, MineSpriteKind)
-    landmine.setPosition(randint(16, 144), randint(16, 496))
-}
-
-let rightBullet : Sprite = null
-let leftBullet : Sprite = null
-let landmine : Sprite = null
-let statusbar : StatusBarSprite = null
-let hp_max = 100
-let hp = hp_max
-function IntroSceneStart() {
-    let my_sprite = sprites.create(img`
-        . . . . . . . . . . b 5 b . . .
-        . . . . . . . . . b 5 b . . . .
-        . . . . . . . . . b c . . . . .
-        . . . . . . b b b b b b . . . .
-        . . . . . b b 5 5 5 5 5 b . . .
-        . . . . b b 5 d 1 f 5 5 d f . .
-        . . . . b 5 5 1 f f 5 d 4 c . .
-        . . . . b 5 5 d f b d d 4 4 . .
-        b d d d b b d 5 5 5 4 4 4 4 4 b
-        b b d 5 5 5 b 5 5 4 4 4 4 4 b .
-        b d c 5 5 5 5 d 5 5 5 5 5 b . .
-        c d d c d 5 5 b 5 5 5 5 5 5 b .
-        c b d d c c b 5 5 5 5 5 5 5 b .
-        . c d d d d d d 5 5 5 5 5 d b .
-        . . c b d d d d d 5 5 5 b b . .
-        . . . c c c c c c c c b b . . .
-    `, SpriteKind.Player)
-}
-
 function BattleSceneStart() {
     
     scene.onHitWall(SpriteKind.Projectile, function on_hit_wall(sprite3: Sprite, location: tiles.Location) {
@@ -84,38 +23,38 @@ function BattleSceneStart() {
         
         bullet.destroy()
     })
-    let messenger = sprites.create(img`
-            . . . . . . f f f f . . . . . .
-                . . . . f f f 2 2 f f f . . . .
-                . . . f f f 2 2 2 2 f f f . . .
-                . . f f f e e e e e e f f f . .
-                . . f f e 2 2 2 2 2 2 e e f . .
-                . . f e 2 f f f f f f 2 e f . .
-                . . f f f f e e e e f f f f . .
-                . f f e f b f 4 4 f b f e f f .
-                . f e e 4 1 f d d f 1 4 e e f .
-                . . f e e d d d d d d e e f . .
-                . . . f e e 4 4 4 4 e e f . . .
-                . . e 4 f 2 2 2 2 2 2 f 4 e . .
-                . . 4 d f 2 2 2 2 2 2 f d 4 . .
-                . . 4 4 f 4 4 5 5 4 4 f 4 4 . .
-                . . . . . f f f f f f . . . . .
-                . . . . . f f . . f f . . . . .
+    messenger = sprites.create(img`
+            . . . . . . f f f f . . . . . . 
+                    . . . . f f f 2 2 f f f . . . . 
+                    . . . f f f 2 2 2 2 f f f . . . 
+                    . . f f f e e e e e e f f f . . 
+                    . . f f e 2 2 2 2 2 2 e e f . . 
+                    . . f e 2 f f f f f f 2 e f . . 
+                    . . f f f f e e e e f f f f . . 
+                    . f f e f b f 4 4 f b f e f f . 
+                    . f e e 4 1 f d d f 1 4 e e f . 
+                    . . f e e d d d d d d e e f . . 
+                    . . . f e e 4 4 4 4 e e f . . . 
+                    . . e 4 f 2 2 2 2 2 2 f 4 e . . 
+                    . . 4 d f 2 2 2 2 2 2 f d 4 . . 
+                    . . 4 4 f 4 4 5 5 4 4 f 4 4 . . 
+                    . . . . . f f f f f f . . . . . 
+                    . . . . . f f . . f f . . . . .
         `, SpriteKind.Player)
     controller.moveSprite(messenger)
     scene.cameraFollowSprite(messenger)
     statusbar = statusbars.create(20, 4, StatusBarKind.Health)
     statusbar.attachToSprite(messenger)
     //  barbed_wire
-    let wire = sprites.create(img`
-            f f f f 1 f f f f 1 f f f f f f
-                f f f f 1 f f f f 1 f f 1 f f f
-                f f f f 1 f f f 1 f f f 1 f f f
-                f f f f 1 f f f 1 f f f 1 f f f
-                f f 1 1 f f f 1 1 f f 1 f f f f
-                f 1 f f f f f 1 f f f 1 f f f f
-                f f f f f f f f f f f 1 f f f f
-                f f f f f f f f f f f f f f f f
+    wire = sprites.create(img`
+            f f f f 1 f f f f 1 f f f f f f 
+                    f f f f 1 f f f f 1 f f 1 f f f 
+                    f f f f 1 f f f 1 f f f 1 f f f 
+                    f f f f 1 f f f 1 f f f 1 f f f 
+                    f f 1 1 f f f 1 1 f f 1 f f f f 
+                    f 1 f f f f f 1 f f f 1 f f f f 
+                    f f f f f f f f f f f 1 f f f f 
+                    f f f f f f f f f f f f f f f f
         `, SpriteKind.Enemy)
     wire.setPosition(30, 30)
     scaling.scaleToPixels(wire, randint(32, 64), ScaleDirection.Horizontally, ScaleAnchor.Middle)
@@ -126,13 +65,13 @@ function BattleSceneStart() {
         
         leftBullet = sprites.create(img`
                 . . . . . . . .
-                        . . . . . . . .
-                        . . . . . . . .
-                        . 5 f 5 5 5 . .
-                        . 5 f 5 5 5 5 .
-                        . 5 f 5 5 5 . .
-                        . . . . . . . .
-                        . . . . . . . .
+                                        . . . . . . . .
+                                        . . . . . . . .
+                                        . 5 f 5 5 5 . .
+                                        . 5 f 5 5 5 5 .
+                                        . 5 f 5 5 5 . .
+                                        . . . . . . . .
+                                        . . . . . . . .
             `, SpriteKind.Projectile)
         leftBullet.setPosition(0, randint(16, 496))
         leftBullet.setVelocity(randint(60, 130), 0)
@@ -141,19 +80,104 @@ function BattleSceneStart() {
     game.onUpdateInterval(randint(500, 1000), function on_update_interval2() {
         
         rightBullet = sprites.create(img`
-                    . . . . . . . .
-                            . . . . . . . .
-                            . . . . . . . .
-                            . 5 f 5 5 5 . .
-                            . 5 f 5 5 5 5 .
-                            . 5 f 5 5 5 . .
-                            . . . . . . . .
-                            . . . . . . . .
-                `, SpriteKind.Projectile)
+                . . . . . . . .
+                                            . . . . . . . .
+                                            . . . . . . . .
+                                            . 5 f 5 5 5 . .
+                                            . 5 f 5 5 5 5 .
+                                            . 5 f 5 5 5 . .
+                                            . . . . . . . .
+                                            . . . . . . . .
+            `, SpriteKind.Projectile)
         rightBullet.setPosition(0, randint(16, 496))
         rightBullet.setVelocity(randint(60, 130), 0)
         rightBullet.startEffect(effects.trail)
     })
 }
 
-change_Scene("Battle")
+function IntroSceneStart() {
+    
+    duck = sprites.create(img`
+            . . . . . . . . . . b 5 b . . . 
+                    . . . . . . . . . b 5 b . . . . 
+                    . . . . . . . . . b c . . . . . 
+                    . . . . . . b b b b b b . . . . 
+                    . . . . . b b 5 5 5 5 5 b . . . 
+                    . . . . b b 5 d 1 f 5 5 d f . . 
+                    . . . . b 5 5 1 f f 5 d 4 c . . 
+                    . . . . b 5 5 d f b d d 4 4 . . 
+                    b d d d b b d 5 5 5 4 4 4 4 4 b 
+                    b b d 5 5 5 b 5 5 4 4 4 4 4 b . 
+                    b d c 5 5 5 5 d 5 5 5 5 5 b . . 
+                    c d d c d 5 5 b 5 5 5 5 5 5 b . 
+                    c b d d c c b 5 5 5 5 5 5 5 b . 
+                    . c d d d d d d 5 5 5 5 5 d b . 
+                    . . c b d d d d d 5 5 5 b b . . 
+                    . . . c c c c c c c c b b . . .
+        `, SpriteKind.Player)
+    //  HOMEWORK!Walk left to talk to the duck and then switch to the battle scene
+    scaling.scaleByPercent(duck, 50, ScaleDirection.Uniformly, ScaleAnchor.Middle)
+    game.showLongText("Welcome to Time Travelling Co! Get to your work! (You may die)", DialogLayout.Bottom)
+}
+
+function PuzzleSceneStart() {
+    game
+}
+
+function change_Scene(sceneName: string) {
+    if (sceneName == "Intro") {
+        tiles.setCurrentTilemap(introScene)
+        IntroSceneStart()
+    } else if (sceneName == "Battle") {
+        tiles.setCurrentTilemap(battleScene)
+        BattleSceneStart()
+    } else if (sceneName == "Puzzle") {
+        tiles.setCurrentTilemap(puzzleScene)
+        PuzzleSceneStart()
+    }
+    
+}
+
+function spawn_landmine() {
+    
+    landmine = sprites.create(img`
+            . . . . . . . . . . . . 
+                    . . . 6 6 6 6 6 6 . . . 
+                    . . 6 6 6 6 6 6 6 6 . . 
+                    . 6 6 6 6 6 6 6 6 6 6 . 
+                    . 6 6 6 6 6 6 2 6 6 6 . 
+                    . 6 6 6 6 f f 6 6 6 6 . 
+                    . 6 6 6 f f f f 6 6 6 . 
+                    . 6 6 6 6 f f 6 6 6 6 . 
+                    . 6 6 6 6 6 6 6 6 6 6 . 
+                    . . 6 6 6 6 6 6 6 6 . . 
+                    . . . 6 6 6 6 6 6 . . . 
+                    . . . . . . . . . . . .
+        `, MineSpriteKind)
+    landmine.setPosition(randint(16, 144), randint(16, 496))
+}
+
+let landmine : Sprite = null
+let duck : Sprite = null
+let wire : Sprite = null
+let messenger : Sprite = null
+let puzzleScene : tiles.TileMapData = null
+let introScene : tiles.TileMapData = null
+let battleScene : tiles.TileMapData = null
+let statusbar : StatusBarSprite = null
+let leftBullet : Sprite = null
+let rightBullet : Sprite = null
+battleScene = tilemap`
+    level1
+`
+introScene = tilemap`
+    level5
+`
+puzzleScene = tilemap`
+    level6
+`
+let currentScene = "Battle"
+let MineSpriteKind = SpriteKind.create()
+let hp_max = 100
+let hp = hp_max
+change_Scene("Intro")
