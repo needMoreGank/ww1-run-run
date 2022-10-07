@@ -1,3 +1,5 @@
+name =  Spritekind.create()
+
 def on_on_overlap(sprite, otherSprite):
     game.over(False)
 sprites.on_overlap(SpriteKind.player, SpriteKind.projectile, on_on_overlap)

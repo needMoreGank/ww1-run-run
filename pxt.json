@@ -3,7 +3,9 @@
     "description": "",
     "dependencies": {
         "device": "*",
-        "animation": "*"
+        "animation": "*",
+        "pxt-status-bar": "github:jwunderl/pxt-status-bar#v0.4.1",
+        "sprite-scaling": "*"
     },
     "files": [
         "main.blocks",
@@ -20,7 +22,7 @@
         "test.ts"
     ],
     "targetVersions": {
-        "target": "1.8.30",
+        "target": "1.10.36",
         "targetId": "arcade"
     },
     "supportedTargets": [
