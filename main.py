@@ -2,6 +2,10 @@ tiles.set_current_tilemap(tilemap("""level1"""))
 #tile size = 16
 #10x160 = 160 X 144
 #16x32 = 512 Y 496
+
+MineSpriteKind = SpriteKind.create()
+
+
 scene.set_background_image(img("""
     ................................................................................................................................................................
     ................................................................................................................................................................
@@ -149,7 +153,6 @@ messenger = sprites.create(img("""
 currentScene = "game"
 controller.move_sprite(messenger)
 scene.camera_follow_sprite(messenger)
-messenger.setPosition()
 
 
 def spawn_leftBullet():
@@ -231,7 +234,7 @@ def spawn_landmine():
         . . . 6 6 6 6 6 6 . . .
         . . . . . . . . . . . .
     """),
-        SpriteKind.enemy)
+        MineSpriteKind)
     landmine.set_position(randint(16, 144), randint(16, 496))
 
 for x in range(randint(6, 11)):
