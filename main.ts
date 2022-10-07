@@ -2,6 +2,7 @@ tiles.setCurrentTilemap(tilemap`level1`)
 // tile size = 16
 // 10x160 = 160 X 144
 // 16x32 = 512 Y 496
+let MineSpriteKind = SpriteKind.create()
 scene.setBackgroundImage(img`
     ................................................................................................................................................................
     ................................................................................................................................................................
@@ -147,6 +148,7 @@ let messenger = sprites.create(img`
 let currentScene = "game"
 controller.moveSprite(messenger)
 scene.cameraFollowSprite(messenger)
+messenger.setPosition(80, 490)
 game.onUpdateInterval(randint(500, 1000), function spawn_leftBullet() {
     let leftBullet = sprites.create(img`
         . . . . . . . .
@@ -217,7 +219,7 @@ function spawn_landmine() {
         . . 6 6 6 6 6 6 6 6 . .
         . . . 6 6 6 6 6 6 . . .
         . . . . . . . . . . . .
-    `, SpriteKind.Enemy)
+    `, MineSpriteKind)
     landmine.setPosition(randint(16, 144), randint(16, 496))
 }
 

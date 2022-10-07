@@ -149,7 +149,7 @@ messenger = sprites.create(img("""
 currentScene = "game"
 controller.move_sprite(messenger)
 scene.camera_follow_sprite(messenger)
-messenger.setPosition()
+messenger.setPosition(80, 490)
 
 
 def spawn_leftBullet():
