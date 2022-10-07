@@ -3,7 +3,7 @@
 battleScene = tilemap("""level1""")
 introScene = tilemap("""level5""")
 
-currentScene = "Intro"
+currentScene = "Battle"
 
 MineSpriteKind = SpriteKind.create()
 

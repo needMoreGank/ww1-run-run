@@ -1,6 +1,6 @@
 let battleScene = tilemap`level1`
 let introScene = tilemap`level5`
-let currentScene = "Intro"
+let currentScene = "Battle"
 let MineSpriteKind = SpriteKind.create()
 function change_Scene(sceneName: string) {
     if (sceneName == "Intro") {
