@@ -1,5 +1,8 @@
+
+#a function to switch scenes
+#creates sprites/variables and CALLS functionns
 def BattleSceneStart():
-    global messenger, statusbar, wire
+    global messenger, statusbar, wire, newsScrap, news_count
     
     def on_hit_wall(sprite3, location):
         sprite3.destroy()
@@ -24,6 +27,14 @@ def BattleSceneStart():
             game.over(False)
         bullet.destroy()
     sprites.on_overlap(SpriteKind.player, SpriteKind.projectile, on_on_overlap2)
+
+    #10/12
+    def on_on_overlap3(sprite3, newsScrap):
+        global news_count
+        newsScrap.destroy()
+        news_count = news_count + 1
+        #INSERT NEWSPAPER GAME SCENE CHANGE HERE!!
+    sprites.on_overlap(SpriteKind.player, NewsSpriteKind, on_on_overlap3)
     
     messenger = sprites.create(img("""
             . . . . . . f f f f . . . . . . 
@@ -61,6 +72,27 @@ def BattleSceneStart():
         """),
         SpriteKind.enemy)
     wire.set_position(30, 30)
+
+    #10/12
+    newsScrap = sprites.create(img("""
+        . . . . . . . . . . . . . . . .
+        . . . . . . . 1 1 1 . . . . . .
+        . . . . . 1 1 1 1 1 1 . . . . .
+        . . . . 1 1 1 1 f 1 1 . . . . .
+        . . . 1 1 1 f f 1 1 1 . . . . .
+        . . 1 1 1 f 1 1 1 1 1 1 . . . .
+        . 1 1 f f 1 1 1 1 1 1 1 1 . . .
+        . 1 1 f 1 1 1 1 1 1 1 1 1 . . .
+        . 1 1 1 1 1 1 1 1 1 1 1 1 1 . .
+        . 1 1 d d 1 1 1 1 1 1 1 1 d . .
+        . . d d . d 1 1 1 1 1 1 d . . .
+        . . . . d d 1 1 1 1 1 1 1 d . .
+        . . . . d 1 1 1 1 1 1 1 1 . . .
+        . . . . 1 1 1 1 1 1 . . . . . .
+        . . . . 1 1 1 1 . . . . . . . .
+        . . . . . 1 . . . . . . . . . .
+    """), NewsSpriteKind)
+
     scaling.scale_to_pixels(wire,
         randint(32, 64),
         ScaleDirection.HORIZONTALLY,
@@ -68,17 +100,20 @@ def BattleSceneStart():
     for index in range(randint(6, 11)):
         spawn_landmine()
     
+    for index in range(5):
+        spawn_newsScrap()
+    
     def on_update_interval():
         global leftBullet
         leftBullet = sprites.create(img("""
                 . . . . . . . .
-                                        . . . . . . . .
-                                        . . . . . . . .
-                                        . 5 f 5 5 5 . .
-                                        . 5 f 5 5 5 5 .
-                                        . 5 f 5 5 5 . .
-                                        . . . . . . . .
-                                        . . . . . . . .
+                                                        . . . . . . . .
+                                                        . . . . . . . .
+                                                        . 5 f 5 5 5 . .
+                                                        . 5 f 5 5 5 5 .
+                                                        . 5 f 5 5 5 . .
+                                                        . . . . . . . .
+                                                        . . . . . . . .
             """),
             SpriteKind.projectile)
         leftBullet.set_position(0, randint(16, 496))
@@ -91,13 +126,13 @@ def BattleSceneStart():
         global rightBullet
         rightBullet = sprites.create(img("""
                 . . . . . . . .
-                                            . . . . . . . .
-                                            . . . . . . . .
-                                            . 5 f 5 5 5 . .
-                                            . 5 f 5 5 5 5 .
-                                            . 5 f 5 5 5 . .
-                                            . . . . . . . .
-                                            . . . . . . . .
+                                                            . . . . . . . .
+                                                            . . . . . . . .
+                                                            . 5 f 5 5 5 . .
+                                                            . 5 f 5 5 5 5 .
+                                                            . 5 f 5 5 5 . .
+                                                            . . . . . . . .
+                                                            . . . . . . . .
             """),
             SpriteKind.projectile)
         rightBullet.set_position(0, randint(16, 496))
@@ -160,16 +195,43 @@ def spawn_landmine():
         """),
         MineSpriteKind)
     landmine.set_position(randint(16, 144), randint(16, 496))
+
+#10/12
+def spawn_newsScrap():
+    global newsScrap
+    newsScrap = sprites.create(img("""
+            . . . . . . . . . . . . . . . .
+            . . . . . . . 1 1 1 . . . . . .
+            . . . . . 1 1 1 1 1 1 . . . . .
+            . . . . 1 1 1 1 f 1 1 . . . . .
+            . . . 1 1 1 f f 1 1 1 . . . . .
+            . . 1 1 1 f 1 1 1 1 1 1 . . . .
+            . 1 1 f f 1 1 1 1 1 1 1 1 . . .
+            . 1 1 f 1 1 1 1 1 1 1 1 1 . . .
+            . 1 1 1 1 1 1 1 1 1 1 1 1 1 . .
+            . 1 1 d d 1 1 1 1 1 1 1 1 d . .
+            . . d d . d 1 1 1 1 1 1 d . . .
+            . . . . d d 1 1 1 1 1 1 1 d . .
+            . . . . d 1 1 1 1 1 1 1 1 . . .
+            . . . . 1 1 1 1 1 1 . . . . . .
+            . . . . 1 1 1 1 . . . . . . . .
+            . . . . . 1 . . . . . . . . . .
+        """), NewsSpriteKind)
+    newsScrap.set_position(randint(16, 144), randint(16, 496))
+
+
+#BINDING DUMP
 landmine: Sprite = None
 duck: Sprite = None
 wire: Sprite = None
 messenger: Sprite = None
+newsScrap: Sprite = None
 puzzleScene: tiles.TileMapData = None
 introScene: tiles.TileMapData = None
 battleScene: tiles.TileMapData = None
-statusbar: StatusBarSprite = None
-leftBullet: Sprite = None
 rightBullet: Sprite = None
+leftBullet: Sprite = None
+statusbar: StatusBarSprite = None
 battleScene = tilemap("""
     level1
 """)
@@ -181,6 +243,10 @@ puzzleScene = tilemap("""
 """)
 currentScene = "Battle"
 MineSpriteKind = SpriteKind.create()
+NewsSpriteKind = SpriteKind.create()
 hp_max = 100
 hp = hp_max
 change_Scene("Intro")
+
+#10/12
+news_count = 0

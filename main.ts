@@ -1,4 +1,7 @@
+// a function to switch scenes
+// creates sprites/variables and CALLS functionns
 function BattleSceneStart() {
+    let index: number;
     
     scene.onHitWall(SpriteKind.Projectile, function on_hit_wall(sprite3: Sprite, location: tiles.Location) {
         sprite3.destroy()
@@ -22,6 +25,13 @@ function BattleSceneStart() {
         }
         
         bullet.destroy()
+    })
+    // 10/12
+    // INSERT NEWSPAPER GAME SCENE CHANGE HERE!!
+    sprites.onOverlap(SpriteKind.Player, NewsSpriteKind, function on_on_overlap3(sprite3: Sprite, newsScrap: Sprite) {
+        
+        newsScrap.destroy()
+        news_count = news_count + 1
     })
     messenger = sprites.create(img`
             . . . . . . f f f f . . . . . . 
@@ -57,21 +67,43 @@ function BattleSceneStart() {
                     f f f f f f f f f f f f f f f f
         `, SpriteKind.Enemy)
     wire.setPosition(30, 30)
+    // 10/12
+    newsScrap = sprites.create(img`
+        . . . . . . . . . . . . . . . .
+        . . . . . . . 1 1 1 . . . . . .
+        . . . . . 1 1 1 1 1 1 . . . . .
+        . . . . 1 1 1 1 f 1 1 . . . . .
+        . . . 1 1 1 f f 1 1 1 . . . . .
+        . . 1 1 1 f 1 1 1 1 1 1 . . . .
+        . 1 1 f f 1 1 1 1 1 1 1 1 . . .
+        . 1 1 f 1 1 1 1 1 1 1 1 1 . . .
+        . 1 1 1 1 1 1 1 1 1 1 1 1 1 . .
+        . 1 1 d d 1 1 1 1 1 1 1 1 d . .
+        . . d d . d 1 1 1 1 1 1 d . . .
+        . . . . d d 1 1 1 1 1 1 1 d . .
+        . . . . d 1 1 1 1 1 1 1 1 . . .
+        . . . . 1 1 1 1 1 1 . . . . . .
+        . . . . 1 1 1 1 . . . . . . . .
+        . . . . . 1 . . . . . . . . . .
+    `, NewsSpriteKind)
     scaling.scaleToPixels(wire, randint(32, 64), ScaleDirection.Horizontally, ScaleAnchor.Middle)
-    for (let index = 0; index < randint(6, 11); index++) {
+    for (index = 0; index < randint(6, 11); index++) {
         spawn_landmine()
+    }
+    for (index = 0; index < 5; index++) {
+        spawn_newsScrap()
     }
     game.onUpdateInterval(randint(500, 1000), function on_update_interval() {
         
         leftBullet = sprites.create(img`
                 . . . . . . . .
-                                        . . . . . . . .
-                                        . . . . . . . .
-                                        . 5 f 5 5 5 . .
-                                        . 5 f 5 5 5 5 .
-                                        . 5 f 5 5 5 . .
-                                        . . . . . . . .
-                                        . . . . . . . .
+                                                        . . . . . . . .
+                                                        . . . . . . . .
+                                                        . 5 f 5 5 5 . .
+                                                        . 5 f 5 5 5 5 .
+                                                        . 5 f 5 5 5 . .
+                                                        . . . . . . . .
+                                                        . . . . . . . .
             `, SpriteKind.Projectile)
         leftBullet.setPosition(0, randint(16, 496))
         leftBullet.setVelocity(randint(60, 130), 0)
@@ -81,13 +113,13 @@ function BattleSceneStart() {
         
         rightBullet = sprites.create(img`
                 . . . . . . . .
-                                            . . . . . . . .
-                                            . . . . . . . .
-                                            . 5 f 5 5 5 . .
-                                            . 5 f 5 5 5 5 .
-                                            . 5 f 5 5 5 . .
-                                            . . . . . . . .
-                                            . . . . . . . .
+                                                            . . . . . . . .
+                                                            . . . . . . . .
+                                                            . 5 f 5 5 5 . .
+                                                            . 5 f 5 5 5 5 .
+                                                            . 5 f 5 5 5 . .
+                                                            . . . . . . . .
+                                                            . . . . . . . .
             `, SpriteKind.Projectile)
         rightBullet.setPosition(0, randint(16, 496))
         rightBullet.setVelocity(randint(60, 130), 0)
@@ -157,16 +189,42 @@ function spawn_landmine() {
     landmine.setPosition(randint(16, 144), randint(16, 496))
 }
 
+// 10/12
+function spawn_newsScrap() {
+    
+    newsScrap = sprites.create(img`
+            . . . . . . . . . . . . . . . .
+            . . . . . . . 1 1 1 . . . . . .
+            . . . . . 1 1 1 1 1 1 . . . . .
+            . . . . 1 1 1 1 f 1 1 . . . . .
+            . . . 1 1 1 f f 1 1 1 . . . . .
+            . . 1 1 1 f 1 1 1 1 1 1 . . . .
+            . 1 1 f f 1 1 1 1 1 1 1 1 . . .
+            . 1 1 f 1 1 1 1 1 1 1 1 1 . . .
+            . 1 1 1 1 1 1 1 1 1 1 1 1 1 . .
+            . 1 1 d d 1 1 1 1 1 1 1 1 d . .
+            . . d d . d 1 1 1 1 1 1 d . . .
+            . . . . d d 1 1 1 1 1 1 1 d . .
+            . . . . d 1 1 1 1 1 1 1 1 . . .
+            . . . . 1 1 1 1 1 1 . . . . . .
+            . . . . 1 1 1 1 . . . . . . . .
+            . . . . . 1 . . . . . . . . . .
+        `, NewsSpriteKind)
+    newsScrap.setPosition(randint(16, 144), randint(16, 496))
+}
+
+// BINDING DUMP
 let landmine : Sprite = null
 let duck : Sprite = null
 let wire : Sprite = null
 let messenger : Sprite = null
+let newsScrap : Sprite = null
 let puzzleScene : tiles.TileMapData = null
 let introScene : tiles.TileMapData = null
 let battleScene : tiles.TileMapData = null
-let statusbar : StatusBarSprite = null
-let leftBullet : Sprite = null
 let rightBullet : Sprite = null
+let leftBullet : Sprite = null
+let statusbar : StatusBarSprite = null
 battleScene = tilemap`
     level1
 `
@@ -178,6 +236,9 @@ puzzleScene = tilemap`
 `
 let currentScene = "Battle"
 let MineSpriteKind = SpriteKind.create()
+let NewsSpriteKind = SpriteKind.create()
 let hp_max = 100
 let hp = hp_max
 change_Scene("Intro")
+// 10/12
+let news_count = 0
