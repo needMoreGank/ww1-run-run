@@ -24,7 +24,7 @@ def spawn_newsScrap():
 # a function to switch scenes
 # creates sprites/variables and CALLS functionns
 def BattleSceneStart():
-    global messenger, statusbar, wire, newsScrap2, index
+    global messenger, statusbar, wire, newsScrap2, index, Pause, playerX, playerY, news_PList
     
     def on_hit_wall(sprite3, location):
         sprite3.destroy()
@@ -33,28 +33,43 @@ def BattleSceneStart():
     
     def on_on_overlap(sprite, mine):
         global hp
-        hp = hp - 10
-        if hp == 0:
+        if Pause:
+            return
+        hp = hp - 30
+        if hp <= 0:
             game.over(False)
         statusbar.value = hp
         mine.destroy()
+        music.big_crash.play()
+        scene.camera_shake(4, 500)
     sprites.on_overlap(SpriteKind.player, MineSpriteKind, on_on_overlap)
     
     
     def on_on_overlap2(sprite2, bullet):
         global hp
+        if Pause:
+            return
         hp = hp - 20
         statusbar.value = hp
-        if hp == 0:
+        if hp <= 0:
             game.over(False)
         bullet.destroy()
+        music.pew_pew.play()
+        scene.camera_shake(2, 200)
     sprites.on_overlap(SpriteKind.player, SpriteKind.projectile, on_on_overlap2)
     
     
     def on_on_overlap3(sprite32, newsScrap):
-        global news_count
+        global news_count, Pause, news_PList
         newsScrap.destroy()
+        Pause = True
+        news_PList[news_count].set_flag(SpriteFlag.INVISIBLE, False)
+        
         news_count = news_count + 1
+        pause(2000)
+        Pause = False
+        if news_count == 4:
+            change_Scene("PuzzleAnswer")
     sprites.on_overlap(SpriteKind.player, NewsSpriteKind, on_on_overlap3)
     
     messenger = sprites.create(img("""
@@ -76,8 +91,13 @@ def BattleSceneStart():
                     . . . . . f f . . f f . . . . .
         """),
         SpriteKind.player)
-    controller.move_sprite(messenger)
+    playerX = messenger.x
+    playerY = messenger.y
+    # controller.move_sprite(messenger)
     scene.camera_follow_sprite(messenger)
+    messenger.say_text("I should collect pieces of newspaper through this battlefield!!",
+        1000,
+        False)
     statusbar = statusbars.create(20, 4, StatusBarKind.health)
     statusbar.attach_to_sprite(messenger)
     # barbed_wire
@@ -94,25 +114,6 @@ def BattleSceneStart():
         SpriteKind.enemy)
     wire.set_position(30, 30)
     # 10/12
-    newsScrap2 = sprites.create(img("""
-            . . . . . . . . . . . . . . . . 
-                    . . . . . . . 1 1 1 . . . . . . 
-                    . . . . . 1 1 1 1 1 1 . . . . . 
-                    . . . . 1 1 1 1 f 1 1 . . . . . 
-                    . . . 1 1 1 f f 1 1 1 . . . . . 
-                    . . 1 1 1 f 1 1 1 1 1 1 . . . . 
-                    . 1 1 f f 1 1 1 1 1 1 1 1 . . . 
-                    . 1 1 f 1 1 1 1 1 1 1 1 1 . . . 
-                    . 1 1 1 1 1 1 1 1 1 1 1 1 1 . . 
-                    . 1 1 d d 1 1 1 1 1 1 1 1 d . . 
-                    . . d d . d 1 1 1 1 1 1 d . . . 
-                    . . . . d d 1 1 1 1 1 1 1 d . . 
-                    . . . . d 1 1 1 1 1 1 1 1 . . . 
-                    . . . . 1 1 1 1 1 1 . . . . . . 
-                    . . . . 1 1 1 1 . . . . . . . . 
-                    . . . . . 1 . . . . . . . . . .
-        """),
-        NewsSpriteKind)
     scaling.scale_to_pixels(wire,
         randint(32, 64),
         ScaleDirection.HORIZONTALLY,
@@ -121,21 +122,23 @@ def BattleSceneStart():
         spawn_landmine()
         index += 1
     index = 0
-    while index < 5:
+    while index < 4:
         spawn_newsScrap()
         index += 1
     
     def on_update_interval():
-        global leftBullet
+        global leftBullet, Pause
+        if Pause:
+            return
         leftBullet = sprites.create(img("""
                 . . . . . . . .
-                                                                                                                                                        . . . . . . . .
-                                                                                                                                                        . . . . . . . .
-                                                                                                                                                        . 5 f 5 5 5 . .
-                                                                                                                                                        . 5 f 5 5 5 5 .
-                                                                                                                                                        . 5 f 5 5 5 . .
-                                                                                                                                                        . . . . . . . .
-                                                                                                                                                        . . . . . . . .
+                                                                                                                                                                                                                                                        . . . . . . . .
+                                                                                                                                                                                                                                                        . . . . . . . .
+                                                                                                                                                                                                                                                        . 5 f 5 5 5 . .
+                                                                                                                                                                                                                                                        . 5 f 5 5 5 5 .
+                                                                                                                                                                                                                                                        . 5 f 5 5 5 . .
+                                                                                                                                                                                                                                                        . . . . . . . .
+                                                                                                                                                                                                                                                        . . . . . . . .
             """),
             SpriteKind.projectile)
         leftBullet.set_position(0, randint(16, 496))
@@ -145,16 +148,18 @@ def BattleSceneStart():
     
     
     def on_update_interval2():
-        global rightBullet
+        global rightBullet, Pause
+        if Pause:
+            return
         rightBullet = sprites.create(img("""
                 . . . . . . . .
-                                                                                                                                                            . . . . . . . .
-                                                                                                                                                            . . . . . . . .
-                                                                                                                                                            . 5 f 5 5 5 . .
-                                                                                                                                                            . 5 f 5 5 5 5 .
-                                                                                                                                                            . 5 f 5 5 5 . .
-                                                                                                                                                            . . . . . . . .
-                                                                                                                                                            . . . . . . . .
+                                                                                                                                                                                                                                                            . . . . . . . .
+                                                                                                                                                                                                                                                            . . . . . . . .
+                                                                                                                                                                                                                                                            . 5 f 5 5 5 . .
+                                                                                                                                                                                                                                                            . 5 f 5 5 5 5 .
+                                                                                                                                                                                                                                                            . 5 f 5 5 5 . .
+                                                                                                                                                                                                                                                            . . . . . . . .
+                                                                                                                                                                                                                                                            . . . . . . . .
             """),
             SpriteKind.projectile)
         rightBullet.set_position(0, randint(16, 496))
@@ -162,6 +167,23 @@ def BattleSceneStart():
         rightBullet.start_effect(effects.trail)
     game.on_update_interval(randint(500, 1000), on_update_interval2)
     
+    def on_update_interval3():
+        global Pause, playerX, playerY
+        if Pause:
+            return
+        else:
+            if controller.player1.is_pressed(ControllerButton.UP):
+                playerY -= 1
+            elif  controller.player1.is_pressed(ControllerButton.DOWN):
+                playerY += 1
+            elif controller.player1.is_pressed(ControllerButton.RIGHT):
+                playerX += 1
+            elif controller.player1.is_pressed(ControllerButton.LEFT):
+                playerX -= 1
+        messenger.set_position(playerX, playerY)
+    game.on_update_interval(10, on_update_interval3)
+    Pause = False
+
 def IntroSceneStart():
     global duck
     duck = sprites.create(img("""
@@ -187,6 +209,7 @@ def IntroSceneStart():
     scaling.scale_by_percent(duck, 50, ScaleDirection.UNIFORMLY, ScaleAnchor.MIDDLE)
     game.show_long_text("Welcome to Time Travelling Co! Get to your work! (You may die)",
         DialogLayout.BOTTOM)
+# BINDING DUMP
 def PuzzleSceneStart():
     global QuizImgRoot
     QuizImgRoot = sprites.create(img("""
@@ -696,6 +719,17 @@ def PuzzleSceneStart():
         120,
         ScaleDirection.UNIFORMLY,
         ScaleAnchor.MIDDLE)
+    game.show_long_text("Hmm, Looks this Paper was torn out", DialogLayout.BOTTOM)
+    game.show_long_text("Breaking News!!", DialogLayout.BOTTOM)
+    game.show_long_text("The Heir of XXXXX Empire got shot by Serbian terrorist",
+        DialogLayout.BOTTOM)
+    game.show_long_text("Hmm... What Country is it? I should find the piece of this Newspaper",
+        DialogLayout.BOTTOM)
+    QuizImgRoot.set_flag(SpriteFlag.INVISIBLE, True)
+    change_Scene("Battle")
+def PuzzleAnswerSceneStart():
+    global Pause
+    Pause = True
 def change_Scene(sceneName: str):
     if sceneName == "Intro":
         tiles.set_current_tilemap(introScene)
@@ -706,6 +740,9 @@ def change_Scene(sceneName: str):
     elif sceneName == "Puzzle":
         tiles.set_current_tilemap(puzzleScene)
         PuzzleSceneStart()
+    elif sceneName == "PuzzleAnswer":
+        tiles.set_current_tilemap(puzzleAnswerScene)
+
 def spawn_landmine():
     global landmine
     landmine = sprites.create(img("""
@@ -723,27 +760,31 @@ def spawn_landmine():
                     . . . . . . . . . . . .
         """),
         MineSpriteKind)
-    landmine.set_position(randint(16, 144), randint(16, 496))
-"""
-
-BINDING DUMP
-
-"""
+    x = randint(16, 144)
+    y = randint(16, 496)
+    while abs(messenger.x - x) < 50 or abs(messenger.y - y) < 50:
+        x = randint(16, 144)
+        y = randint(16, 496)
+    landmine.set_position(x,y)
 landmine: Sprite = None
 QuizImgRoot: Sprite = None
 duck: Sprite = None
 index = 0
 wire: Sprite = None
+playerX = 0
 messenger: Sprite = None
 newsScrap2: Sprite = None
 puzzleScene: tiles.TileMapData = None
 introScene: tiles.TileMapData = None
 battleScene: tiles.TileMapData = None
+playerX = 0
+playerY = 0
 rightBullet: Sprite = None
 leftBullet: Sprite = None
 statusbar: StatusBarSprite = None
 # 10/12
 news_count = 0
+Pause = False
 battleScene = tilemap("""
     level1
 """)
@@ -753,9 +794,262 @@ introScene = tilemap("""
 puzzleScene = tilemap("""
     level11
 """)
+puzzleAnswerScene = tilemap("""
+    level12
+""")
+
 currentScene = "Battle"
 MineSpriteKind = SpriteKind.create()
 NewsSpriteKind = SpriteKind.create()
+NewsSpriteKind_UI = SpriteKind.create()
+news_P1 = sprites.create(img("""
+        fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffbdddddddddddddff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffddddddddddddddddddddddddbdddff
+            ffffffffffffdddbddddddddddddddddddddddddddddddddddddddddddfffffffffffffffffffffffffffffffffffffffffffffffddddddddddddddddddddddddddddddddddddddddddff
+            ffffffffffffdddddbbddddddddddddddddddddddddbddddddddddddddddddddddddfffffffffffffffffffffffdddddddddddddddddddddddddddddddddddddddddddddddddddddddfff
+            ffffffffffffddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddbddddddddddddddddddddddddbddddddddddddddddddddddddddddddddddddbdddddfff
+            ffffffffffffddddddbdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddbbddddddddddddddddddddddddddddddddddddddddfff
+            ffffffffffff1ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddbdddddddddddffff
+            fffffffffffffddddddddddddddddddddddddddddddddddddddddddddddddbddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddbddbbffff
+            fffffffffffffddddddddddddddddddddddddddddddddddddddddddddddddddddbdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddffff
+            fffffffffffffddddddbcdddddbdddddddddddddddddddddddddddbbddddddddddddbcbddddbcbdddddddddddddddddddddddddddddddddddddddddddddbddddddbdddddbddddddddffff
+            ffffffffffffffdddbdccbdddddddddbdddddddddbdddddddddddbbdddddddddddddbcbddddbcbdddddddddddddddbdddddddddddddddddddbbdddddddccbdddddbdddddddddddddddfff
+            ffffffffffffffddddbccbddddddbddbbdddddddddbcbddbbdddddddddddddddddddbcbddddbcbddddddddddddddddddddddddddddddddddddddddddddbcddddddddddddddbdddddddfff
+            ffffffffffffffddddccccdddddddddddddddddddbccbdddddddddddddddddddddddbcbddddbcbddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddfff
+            fffffffffffffffddbccbcbbdddbbbddbdddbbbbdbccbbbbdbbbddbbbbddddddddddbcbbbbbbcbddbbdddbbddbbbbbdddddbbbbbddddbbbbbbddbbdbbdbbddddbbbdbbddbbbbbdddddfff
+            fffffffffffffffddbcbbccddddccddbcbddccccbbcccbbccccbdbcccccbddddddddbccccccccbddccddbcbdbccccccddbcccccccddbccccccddbccccdbcbddcccccccdbccccccddddfff
+            fffffffffffffffdbccddbcbdddccddbcbdbcbbbddccbbbccdddbccbdbccbdddddddbcbbbbbbcbddccddbcbdbccddccddbcbddbccddccddbccddbcbdddbcbdbcbddbccddccddbcbdddfff
+            ffffffffffffffffbcbbbbccdbdccddbccdbccbdddccbdbcbdddccbdddccbdbbbbbdbcbddddbcbddccddbcbdbcbddccddccbdddccdbcbdddccddbcbdddbcbdccddddccddccddbcbdddfff
+            ffffffffffffffffccccccccbddccddbcbdbbcccbdccddbcbdddccddbbbcbdccccbdbcbddddbcbddccddbcbdbcbddbcddccddddccdbcbdddbcddbcddddbcbdccddddccdbccddbcbdddfff
+            ffffffffffffffffcbbbbbbccddccddbcbddddbcbdccddbcbdddccbbddccbdbbbbddbcbddddbcbddccddbcbdbcbddbcddccddddccdbcbdddccbdbcbdddbcbdccddddccdbccddbcbdddfff
+            fffffffffffffffccddddddccbdccbdbcbdbcdbcbdccddbcbdbdbccddbccddddddddbcbddddbcbddccbdbcbdbcbddbcddbcbddbccdbccbdbccbdbcbdddbcbdbcbddbccddccddbcbddffff
+            fffffffffffffdbcbdddddbbcbdbcccccddbccccbdccddbcbddddbcccccbddddddddbcbddddbcbddbcccccddbcbddbcdddcccccccddbccccccbdbcbdddbcbddcccccccddccddbcbdfffff
+            fffffffffffdddbbddddddbdbbddbbbbddddbbbbdbbbdddbddddddbbbbbddddddddddbbddddbbddddbbbbdddbbbddbbddddbbbbccdddbbbbbbdddbdddbbbddddbbbdbbddbbdddbddfffff
+            fffffffff1dddddddddddddddddbbddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddbbdddbcbddddddddddddddddddddddddddddddddddddddffffff
+            ffffffffddddbddddddddddbddddddddddddddddddddddddddddddddddddddddddddbddddddddddddddddddddddddddddbccbdccbdddddddddddddddddddddddddddddddddddddddfffff
+            ffffffdddddddbbddddddddbdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddbddddddbdddddddbccccbddddddddddddddddddddddddddddddddddddddddddfff
+            ffffddbddbdddddddddbbddddddddbddddddddddddddddddddddddddddddddbdddddddddddddddddddddddddddddddddddddbbddddddddddddddddddddddddddddddddddddddddddddddf
+            ffddbddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddbddddddddbdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+            1dddbddddddbdddbddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddf
+            ddddddddddddddddddbdddddddddddddddddddddddddddddddddddddddddddddddddddbddddddddddddddddddddddddddddddddddddddddffffffffffffffffffffffffffffffffffffff
+            dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddbfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+    """),
+    NewsSpriteKind_UI)
+news_P1.set_flag(SpriteFlag.INVISIBLE, True)
+news_P2 = sprites.create(img("""
+        fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            ffffffffffffffffffffffffffddddfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            ffffffffffffffffffddddddfffdddddddfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            ffffffffffffffffffdddddddddddddddddddffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            ffffffffffffffffffddddddddddddbddddddddddfffffffffffffffffffffffffffffffffffddddddddfffffffffffffff
+            ffffffffffffffffffddddddddddddddddbddddddddddfffffffffffffffffffffffddddddddddddddddfffffffffffffff
+            ffffffffffffffffffdddddbbdddddddddddddddddddddddbfffffffffffddddddddddddddddddddddddfffffffffffffff
+            ffffffffffffffffffddddbbddddddddddddddddddddddddddddddddddddddbdddddddddddddddddddbffffffffffffffff
+            ffffffffffffffffffdddddbbbbddddddddddddddddddddddddddddddddddddddddddddddddddddddddffffffffffffffff
+            ffffffffffffffffffddddbcccccbddddddddddddddddddddddddddddddddddddddddddddddddddddddffffffffffffffff
+            ffffffffffffffffffddbcccbbbcccddddddddddddddddddddddddddddddddddddddddddddddddddddfffffffffffffffff
+            ffffffffffffffffffddccbdddddccbddddddddbddddddddddddddddddddddddddddddddddddddddddfffffffffffffffff
+            fffffffffffffffffddbccddddddbbdddddddddddddddddddddddddddddbdddddddddddddddddddddffffffffffffffffff
+            ffffffffffffffffdddbcbddddddddddddbccbbdddbbbcbdbbbcbdbcbddddbbcbbbbddbbbcbddddddffffffffffffffffff
+            ffffffffffffffffdddccbdddbbbbbbddbcccccddbccccdbcccccccccbddbccccccbdbccccccdddddffffffffffffffffff
+            fffffffffffffffddddccdddddcccccddccddbcbdbccdddbccdbccddccddccbddccbdbccddccbdddfffffffffffffffffff
+            fffffffffffffffddddccbddddbbbccdbcccccccdbcbdddbcbddccddccdbccdddbcbdbcbddbcbdddfffffffffffffffffff
+            ffffffffffffffdddddbcbddddddbcbdbccccccbdbcbdddbcbddccddccdbcbddddcbdbcbddbcbdddfffffffffffffffffff
+            fffffffffffff1ddddddccbdddddccddbcbddddddbcbdddbcbddccddccddccdddbcbdbcbddbcbddffffffffffffffffffff
+            fffffffffffffdddddddbccbddbccbdddccbdbcbdbcbdddbcbddccddccddccbdbccbdbcbddbcbddffffffffffffffffffff
+            ffffffffffffbddddddddbccccccbddddbcccccddbcbdddbcbddccddccddbccccccbdbcbddbcbdfffffffffffffffffffff
+            ffffffffffffdddddddddddbbbbbddddddbbbbddddddddddddddbbdddddbddbbbddddddddffffffffffffffffffffffffff
+            fffffffffffddddddddddddddddddddbddddddddddddddddddddddddddddddddddddfffffffffffffffffffffffffffffff
+            fffffffffffdddddddddddddddddddddddbddddddddbdddddddddddddddddddffffffffffffffffffffffffffffffffffff
+            fffffffffffdddddddddddddddddddddddddddddddddddddddddddddddfffffffffffffffffffffffffffffffffffffffff
+            ffffffffffffffffffffffdddddddddddddddddbdddddddddddddffffffffffffffffffffffffffffffffffffffffffffff
+            ffffffffffffffffffffffffffffffffbdddddddddddddddfffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+    """),
+    NewsSpriteKind_UI)
+news_P2.set_flag(SpriteFlag.INVISIBLE, True)
+news_P3 = sprites.create(img("""
+        fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffddddffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffddddbdffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            ffddddddddddddfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            ddddddddddddddddbfffffffffffffffffffffffffffffffffffffffff1dddddddddddbbdffffffffffffffffffffffffff
+            dddddddddddddddddddfffffffffffffffffffffffffffffffffffdddddddddddddddddddddddddddddffffffffffffffff
+            ddddddddddddddddddddddffffffffffffffffffffffffffffddddddddddddddddddddddddddddddddddfffffffffffffff
+            dddddddddddddddddddddddddfffffffffffffffffffffddddddddddddddddddddddddddddddddddddddfffffffffffffff
+            fdddddddddddddddddddbbddddddfffffffffffffdddddddddddddddddddddddddddddddddddddddddddfffffffffffffff
+            ffdddddbdddddddddddbbddddddddd1ffffffddddddddddddddddddddddbdddddddddddddddddddbbdddfffffffffffffff
+            ff1ddddddbdddbbdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddfffffffffffffff
+            fffcbddbddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddfffffffffffffff
+            ffffbdddddbbbbddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddfffffffffffffff
+            fffffddddbccccccdbddddddddddddddddddbddddddddddddddddddddddbccddddddddddddddddddddddfffffffffffffff
+            ffffffddbdccddccbddddddddbbdddddddddddddddddddddddddddddbddbccddddddddddddddddddddddfffffffffffffff
+            ffffffbdddccbddccdddddddddddddddddbdddddddddddddddddddddddddddddddddddddddddddddddddfffffffffffffff
+            fffffffdddccddbccddddbbbddddddddbbdbbbddddddbbddddddddbbdddddddddbbbddddddddbbbdddddfffffffffffffff
+            ffffffffddccddbccdddbccccbdddcccccbcccbdddbccccccddccccccdddccddbccccccddbcccccbddddfffffffffffffff
+            fffffffffdccccccbddbccbbccbddccbbccbbccbdbccbbcccddccbbbcbddccdbccbbbccbdbccbbccddddfffffffffffffff
+            fffffffffdccccbddddccbddbccddccddccddbcbdccbddbccddccddbcbddccdbcbdddccbdbcbddccddddfffffffffffffff
+            fffffffffdccbccddddccddddccddccddccddbcbdccddddccddccdddcbddccdbcbdddbcddbcbddccddddfffffffffffffff
+            ffffffffddccdbccdddccddddccddccddccddbcbdccddddccddccddbcbddccdbcbdddbcbdbcbddccddddfffffffffffffff
+            ffffffffddccddbcbddbcbddbccddccddccbdbcbdbcbddbccddccddbcbdbccdbccdddccddbcbddccddddfffffffffffffff
+            fffffffbddccdddccbddccbbccbddccddccbdbcbddccbbcccbdccddbcbdbccddcccbcccbdbcdddccddddfffffffffffffff
+            fffffffdddbbdddbbbddbbcccdddbbbddbbddbbbdddbccbbbddbbdddbbddbbdddbccbbbddbbdddbbddddfffffffffffffff
+            ffffffdddddddddddddddddddddddddbddddddddbdddddddddddddddddddddddddddddddddddddddddddfffffffffffffff
+            ffffffddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddfffffffffffffff
+            fffffdddddddddddddddddddddddddddddddbdddddddddddddddddddddddddddddddddddddddddddddddfffffffffffffff
+            fffffdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddfffffffffffffff
+            ffff1dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddfffffffffffffff
+            ffffddddddddbddddddddbdddddddddddddddddddddddddddddddddddddddddddddddddddddbdddddddffffffffffffffff
+            ffffddddddddddddddddddddddddddddddddddddddddddddddfffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+    """),
+    NewsSpriteKind_UI)
+news_P3.set_flag(SpriteFlag.INVISIBLE, True)
+news_P4 = sprites.create(img("""
+        fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            ffffffffffffffffdddddddddbfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            ffffffffffffffffffdddddddddddddbdddffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            ffffffffffffffffffddbbdddddddddddddddddddddd1ffffffffffffffffffffffffffffffffffffffffffff
+            ffffffffffffffffffdbbddddddddddddddddddddddddddddddddddddddbdddddddddddffffffffffffffffff
+            ffffffffffffffffffdddddddddddddddddddddddddddddddddddddddddddddddddddddffffffffffffffffff
+            fffffffffffffffffffdddddddddddddddddddddddddddddddddddddddddddddddddddddfffffffffffffffff
+            fffffffffffffffffffdddddddddddddddddddddddddddddddddddddddddddddddddddddfffffffffffffffff
+            fffffffffffffffffffbccccbdddddddddddbdddddddddddddbbddddddddddddddddddddfffffffffffffffff
+            fffffffffffffffffffbccbcccbdddddddddddddddddddddddccbdddbddddddddddddddddffffffffffffffff
+            ffffffffffffffffff1bcbddccbdddddddbdddddddddddddddbbdddddddddddddddddddddffffffffffffffff
+            ffffffffffffffffffdbcbbbbcbdddddddddddddddddddddddddddddddddddddddddddddddfffffffffffffff
+            fffffffffffffffffddbcbddccbdbbbddbbbddbccbddbccbddbbdddbbccbbbddbbbccbddddfffffffffffffff
+            fffffffffffffffffddbccbcccddbcbddbcbdbccccddccccbdbcddbcccccccdbcccbccddddfffffffffffffff
+            ffffffffffffffffdddbcccccdddbcbddbcbdccbbdddcbddddccddbcbddbccddccddbcbddddffffffffffffff
+            ffffffffffffffffdddbcbccbdddbcbddbcbdbccbbddcccbddbcddccddddccddccddbcbddddffffffffffffff
+            fffffffffffffffddddbcbbccdddbcbddbcbddbcccdddbccbdbcbdccddddccddccddbcbdddddfffffffffffff
+            fffffffffffffffddddbcbdbcbddbcbddbcbddbdbcbdddbccdbcddccbddbccddccddbcbdddddfffffffffffff
+            ffffffffffffffdddddbcbddccbddccbbccbdccdbcbbcbbccbccddbccbbcccddccddbcbdddddfffffffffffff
+            ffffffffffffffdddddbcbddbccbbbccccbddbcccbddccccbdbcbddbccccccddccddbcbdddddfffffffffffff
+            fffffffffffffddddddddddddddddddbbdddddbbbddddbbdddddddddbbbdddddddddddddd1fffffffffffffff
+            fffffffffffffddddddddddddddddddddddddddddddddddddddddddddddddddddddddddffffffffffffffffff
+            fffffffffffffdddddddddddddddddddddddbdddddddddddddddddddddddddddddddfffffffffffffffffffff
+            ffffffffffffffffffffffffffffbbdddddddddddddddddddddddddddddddddddffffffffffffffffffffffff
+            ffffffffffffffffffffffffffffffffffffffffffffddddddddddddddddddfffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+    """),
+    NewsSpriteKind_UI)
+news_P4.set_flag(SpriteFlag.INVISIBLE, True)
+news_PList = [news_P1, news_P2, news_P3, news_P4]
 hp_max = 100
 hp = hp_max
-change_Scene("Battle")
+Pause = True
+change_Scene("Puzzle")

@@ -5,7 +5,8 @@
         "device": "*",
         "animation": "*",
         "pxt-status-bar": "github:jwunderl/pxt-status-bar#v0.4.1",
-        "sprite-scaling": "*"
+        "sprite-scaling": "*",
+        "arcade-sprite-data": "github:microsoft/arcade-sprite-data#v0.1.0"
     },
     "files": [
         "main.blocks",
@@ -28,5 +29,5 @@
     "supportedTargets": [
         "arcade"
     ],
-    "preferredEditor": "blocksprj"
+    "preferredEditor": "pyprj"
 }
