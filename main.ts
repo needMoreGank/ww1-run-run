@@ -66,9 +66,11 @@ function BattleSceneStart() {
         newsScrap.destroy()
         Pause = true
         news_PList[news_count].setFlag(SpriteFlag.Invisible, false)
+        news_PList[news_count].setPosition(80, sprite32.y)
         news_count = news_count + 1
         pause(2000)
         Pause = false
+        news_PList[news_count].setFlag(SpriteFlag.Invisible, true)
         if (news_count == 4) {
             change_Scene("PuzzleAnswer")
         }

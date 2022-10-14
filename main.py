@@ -64,10 +64,11 @@ def BattleSceneStart():
         newsScrap.destroy()
         Pause = True
         news_PList[news_count].set_flag(SpriteFlag.INVISIBLE, False)
-        
+        news_PList[news_count].set_position(80,sprite32.y)
         news_count = news_count + 1
         pause(2000)
         Pause = False
+        news_PList[news_count].set_flag(SpriteFlag.INVISIBLE, True)
         if news_count == 4:
             change_Scene("PuzzleAnswer")
     sprites.on_overlap(SpriteKind.player, NewsSpriteKind, on_on_overlap3)
