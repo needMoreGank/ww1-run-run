@@ -117,7 +117,7 @@ def BattleSceneStart():
         randint(32, 64),
         ScaleDirection.HORIZONTALLY,
         ScaleAnchor.MIDDLE)
-    while index < randint(6, 11):
+    while index < randint(11, 16):
         spawn_landmine()
         index += 1
     index = 0
@@ -747,9 +747,7 @@ news_count = 0
 battleScene = tilemap("""
     level1
 """)
-introScene = tilemap("""
-    level5
-""")
+introScene = tilemap("""level5""")
 puzzleScene = tilemap("""
     level11
 """)
