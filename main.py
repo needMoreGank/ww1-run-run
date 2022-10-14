@@ -141,32 +141,43 @@ def BattleSceneStart():
     game.on_update_interval(randint(500, 1000), on_update_interval2)
     
 def IntroSceneStart():
-    global duck
+    global duck, messenger
     duck = sprites.create(img("""
-            . . . . . . . . . . b 5 b . . . 
-                    . . . . . . . . . b 5 b . . . . 
-                    . . . . . . . . . b c . . . . . 
-                    . . . . . . b b b b b b . . . . 
-                    . . . . . b b 5 5 5 5 5 b . . . 
-                    . . . . b b 5 d 1 f 5 5 d f . . 
-                    . . . . b 5 5 1 f f 5 d 4 c . . 
-                    . . . . b 5 5 d f b d d 4 4 . . 
-                    b d d d b b d 5 5 5 4 4 4 4 4 b 
-                    b b d 5 5 5 b 5 5 4 4 4 4 4 b . 
-                    b d c 5 5 5 5 d 5 5 5 5 5 b . . 
-                    c d d c d 5 5 b 5 5 5 5 5 5 b . 
-                    c b d d c c b 5 5 5 5 5 5 5 b . 
-                    . c d d d d d d 5 5 5 5 5 d b . 
-                    . . c b d d d d d 5 5 5 b b . . 
-                    . . . c c c c c c c c b b . . .
-        """),
+        . . . . . . . . . . b 5 b . . .
+        . . . . . . . . . b 5 b . . . .
+        . . . . . . . . . b c . . . . .
+        . . . . . . b b b b b b . . . .
+        . . . . . b b 5 5 5 5 5 b . . .
+        . . . . b b 5 d 1 f 5 5 d f . .
+        . . . . b 5 5 1 f f 5 d 4 c . .
+        . . . . b 5 5 d f b d d 4 4 . .
+        b d d d b b d 5 5 5 4 4 4 4 4 b
+        b b d 5 5 5 b 5 5 4 4 4 4 4 b .
+        b d c 5 5 5 5 d 5 5 5 5 5 b . .
+        c d d c d 5 5 b 5 5 5 5 5 5 b .
+        c b d d c c b 5 5 5 5 5 5 5 b .
+        . c d d d d d d 5 5 5 5 5 d b .
+        . . c b d d d d d 5 5 5 b b . .
+        . . . c c c c c c c c b b . . .
+    """),
         SpriteKind.player)
     # HOMEWORK!Walk left to talk to the duck and then switch to the battle scene
     scaling.scale_by_percent(duck, 50, ScaleDirection.UNIFORMLY, ScaleAnchor.MIDDLE)
-    game.show_long_text("Welcome to Time Travelling Co! Get to your work! (You may die)",
-        DialogLayout.BOTTOM)
+    
+    controller.move_sprite(messenger)
+    messenger.setPosition(240, 64)
+    controller.A.on_event(ControllerButtonEvent.PRESSED, on_event_pressed)  
+
+def on_event_pressed():
+    global duck, messenger
+    if (abs(messenger.x - duck.x) < 5 ):
+        if (abs(messenger.y - duck.y) < 5 ):
+            game.show_long_text("Welcome to Time Travelling Co! Get to work! (You might die)", DialogLayout.BOTTOM)
+
+
 def PuzzleSceneStart():
-    game
+    pass
+    #insert game here
 def change_Scene(sceneName: str):
     if sceneName == "Intro":
         tiles.set_current_tilemap(introScene)
@@ -235,9 +246,7 @@ statusbar: StatusBarSprite = None
 battleScene = tilemap("""
     level1
 """)
-introScene = tilemap("""
-    level5
-""")
+introScene = tilemap("""level5""")
 puzzleScene = tilemap("""
     level6
 """)
