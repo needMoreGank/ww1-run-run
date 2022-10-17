@@ -6,7 +6,8 @@
         "animation": "*",
         "pxt-status-bar": "github:jwunderl/pxt-status-bar#v0.4.1",
         "sprite-scaling": "*",
-        "arcade-sprite-data": "github:microsoft/arcade-sprite-data#v0.1.0"
+        "arcade-sprite-data": "github:microsoft/arcade-sprite-data#v0.1.0",
+        "arcade-character-animations": "github:microsoft/arcade-character-animations#v0.0.2"
     },
     "files": [
         "main.blocks",
