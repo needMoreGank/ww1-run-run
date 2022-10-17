@@ -67,19 +67,26 @@ function BattleSceneStart() {
         Pause = true
         news_PList[news_count].setFlag(SpriteFlag.Invisible, false)
         sprite32.setFlag(SpriteFlag.Invisible, true)
+        statusbar.setFlag(SpriteFlag.Invisible, true)
         news_PList[news_count].setPosition(80, sprite32.y)
         game.showLongText("Yes! I think I've found a piece!", DialogLayout.Bottom)
-        pause(2000)
+        pause(1000)
         Pause = false
         sprite32.setFlag(SpriteFlag.Invisible, false)
+        statusbar.setFlag(SpriteFlag.Invisible, false)
         news_PList[news_count].setFlag(SpriteFlag.Invisible, true)
         news_count = news_count + 1
         if (news_count == 4) {
+            game.showLongText("I finally got them all!", DialogLayout.Bottom)
             Pause = true
             change_Scene("PuzzleAnswer")
         }
         
     })
+    //  bullets slow down whenever paused
+    // def bulletslowdown(bullet):
+    //     if bullet.SpriteKind == SpriteKind.projectile:
+    //         bullet.set_velocity(0, 0)
     sprites.onOverlap(SpriteKind.Player, SpriteKind.Projectile, function on_on_overlap2(sprite2: Sprite, bullet: Sprite) {
         
         if (Pause) {
@@ -775,15 +782,19 @@ function PuzzleSceneStart() {
     scaling.scaleToPixels(QuizImgRoot, 120, ScaleDirection.Uniformly, ScaleAnchor.Middle)
     game.showLongText("Hmm, Looks this Paper was torn out", DialogLayout.Bottom)
     game.showLongText("Breaking News!!", DialogLayout.Bottom)
-    game.showLongText("The Heir of XXXXX Empire got shot by Serbian terrorist", DialogLayout.Bottom)
+    game.showLongText("The Heir of the XXXXX Empire got shot by a Serbian student!", DialogLayout.Bottom)
     game.showLongText("Hmm... What Country is it? I should find the piece of this Newspaper", DialogLayout.Bottom)
     QuizImgRoot.setFlag(SpriteFlag.Invisible, true)
     change_Scene("Battle")
 }
 
 function PuzzleAnswerSceneStart() {
+    let x: number;
     
     Pause = true
+    messenger.setPosition(80, 50)
+    messenger.setFlag(SpriteFlag.Invisible, true)
+    statusbar.setFlag(SpriteFlag.Invisible, true)
     
     QuizImgRoot = sprites.create(img`
             dbbdbbddddddbbbddbbdddddbbbdbdddbdddbdddddbdbddddddddbddbddddddddddbdddbdddddddddddddddddddddddddddddddddddddbddddddddbdbddbbbbbdddddddddddddddddbdddddddddddbdbddddddddddbddbddddddddbbddddddddddbbdddbdddddddddddddddddbdddddddddddddddddddddddbdddddddddbbdddddddddddbddddddddddddddddddddbddddddddddddbdbdddddddddddddbbddbbbdddbbddbbddbddddddddbdddddddddddddddddddddddbdddbbbddddddbddbdddddbbdddddddbbddddddddddddddddddbddddddddddddddddbdddbddddbbddbbddbbdbbddbdbbbbbbbddddbbbbbddbbbbbbbbbdbbbbdddddddd
@@ -1290,15 +1301,38 @@ function PuzzleAnswerSceneStart() {
     scaling.scaleToPixels(QuizImgRoot, 120, ScaleDirection.Uniformly, ScaleAnchor.Middle)
     game.showLongText("Now that I've collected all the pieces, let/'s check the newspaper out again", DialogLayout.Bottom)
     game.showLongText("Breaking News!!", DialogLayout.Bottom)
-    game.showLongText("The Heir of XXXXX Empire got shot by Serbian terrorist", DialogLayout.Bottom)
-    game.showLongText("One of these scraps should fit into this torn-out blank!", DialogLayout.Bottom)
-    QuizImgRoot.setFlag(SpriteFlag.Invisible, true)
-    for (let x = 0; x < 3; x++) {
+    for (x = 0; x < 3; x++) {
         news_PList[x].setFlag(SpriteFlag.Invisible, false)
         news_PList[x].setPosition(80, 50)
-        game.showLongText("A scrap", DialogLayout.Bottom)
+        QuizImgRoot.setFlag(SpriteFlag.Invisible, true)
+        game.showLongText(x + 1 + "- The Heir of the XXXXX Empire got shot by a Serbian student!", DialogLayout.Bottom)
         news_PList[x].setFlag(SpriteFlag.Invisible, true)
     }
+    let num = 5
+    game.showLongText("One of these scraps should fit into this torn-out blank!", DialogLayout.Bottom)
+    num = game.askForNumber("What number was it? (Press 5 to inspect them again)", 1)
+    while (num == 5) {
+        x = 0
+        for (x = 0; x < 3; x++) {
+            news_PList[x].setFlag(SpriteFlag.Invisible, false)
+            news_PList[x].setPosition(80, 50)
+            QuizImgRoot.setFlag(SpriteFlag.Invisible, true)
+            game.showLongText(x + 1 + "- The Heir of the XXXXX Empire got shot by a Serbian student!", DialogLayout.Bottom)
+            news_PList[x].setFlag(SpriteFlag.Invisible, true)
+        }
+        game.showLongText("One of these scraps should fit into this torn-out blank!", DialogLayout.Bottom)
+        num = game.askForNumber("What number was it? (Press 5 to inspect them again)", 1)
+    }
+    if (num == 1) {
+        game.showLongText("Seems correct! Let's go! I'm getting paid!", DialogLayout.Bottom)
+        game.over(true)
+    } else if (num == 2 || 3 || 4) {
+        game.showLongText("Seems correct! Let's go! I'm getting paid!", DialogLayout.Bottom)
+        num == 5
+    } else {
+        game.showLongText("That's not a valid number...", DialogLayout.Bottom)
+    }
+    
 }
 
 function change_Scene(sceneName: string) {

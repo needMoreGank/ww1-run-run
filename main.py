@@ -61,22 +61,31 @@ def BattleSceneStart():
     
     
     def on_on_overlap3(sprite32, newsScrap):
-        global news_count, Pause, news_PList
+        global news_count, Pause, news_PList, statusbar
         newsScrap.destroy()
         Pause = True
         news_PList[news_count].set_flag(SpriteFlag.INVISIBLE, False)
         sprite32.set_flag(SpriteFlag.INVISIBLE, True)
+        statusbar.set_flag(SpriteFlag.INVISIBLE, True)
         news_PList[news_count].set_position(80,sprite32.y)
         game.show_long_text("Yes! I think I've found a piece!", DialogLayout.BOTTOM)
-        pause(2000)
+        
+        pause(1000)
         Pause = False
         sprite32.set_flag(SpriteFlag.INVISIBLE, False)
+        statusbar.set_flag(SpriteFlag.INVISIBLE, False)
         news_PList[news_count].set_flag(SpriteFlag.INVISIBLE, True)
         news_count = news_count + 1
         if news_count == 4:
+            game.show_long_text("I finally got them all!", DialogLayout.BOTTOM)
             Pause = True
             change_Scene("PuzzleAnswer")
     sprites.on_overlap(SpriteKind.player, NewsSpriteKind, on_on_overlap3)
+
+    # bullets slow down whenever paused
+    #def bulletslowdown(bullet):
+    #    if bullet.SpriteKind == SpriteKind.projectile:
+    #        bullet.set_velocity(0, 0)
 
     def on_on_overlap2(sprite2, bullet):
         global hp
@@ -773,7 +782,7 @@ def PuzzleSceneStart():
         ScaleAnchor.MIDDLE)
     game.show_long_text("Hmm, Looks this Paper was torn out", DialogLayout.BOTTOM)
     game.show_long_text("Breaking News!!", DialogLayout.BOTTOM)
-    game.show_long_text("The Heir of XXXXX Empire got shot by Serbian terrorist",
+    game.show_long_text("The Heir of the XXXXX Empire got shot by a Serbian student!",
         DialogLayout.BOTTOM)
     game.show_long_text("Hmm... What Country is it? I should find the piece of this Newspaper",
         DialogLayout.BOTTOM)
@@ -784,6 +793,9 @@ def PuzzleAnswerSceneStart():
     global Pause, news_PList
     Pause = True
 
+    messenger.set_position(80, 50)
+    messenger.set_flag(SpriteFlag.INVISIBLE, True)
+    statusbar.set_flag(SpriteFlag.INVISIBLE, True)
     
     global QuizImgRoot
     QuizImgRoot = sprites.create(img("""
@@ -1295,17 +1307,47 @@ def PuzzleAnswerSceneStart():
         ScaleAnchor.MIDDLE) 
     game.show_long_text("Now that I've collected all the pieces, let/'s check the newspaper out again", DialogLayout.BOTTOM)
     game.show_long_text("Breaking News!!", DialogLayout.BOTTOM)
-    game.show_long_text("The Heir of XXXXX Empire got shot by Serbian terrorist",
-        DialogLayout.BOTTOM)
-    game.show_long_text("One of these scraps should fit into this torn-out blank!",
-        DialogLayout.BOTTOM)
-    QuizImgRoot.set_flag(SpriteFlag.INVISIBLE, True)
+    
 
     for x in range(3):
         news_PList[x].set_flag(SpriteFlag.INVISIBLE, False)
         news_PList[x].set_position(80, 50)
-        game.show_long_text("A scrap", DialogLayout.BOTTOM)
+        QuizImgRoot.set_flag(SpriteFlag.INVISIBLE, True)
+        game.show_long_text((x+1) + "- The Heir of the XXXXX Empire got shot by a Serbian student!",
+                DialogLayout.BOTTOM)
         news_PList[x].set_flag(SpriteFlag.INVISIBLE, True)
+
+
+    num = 5
+    game.show_long_text("One of these scraps should fit into this torn-out blank!",
+    DialogLayout.BOTTOM)
+    num = game.ask_for_number("What number was it? (Press 5 to inspect them again)", 1)
+
+    while num == 5:
+        x = 0
+        for x in range(3):
+            news_PList[x].set_flag(SpriteFlag.INVISIBLE, False)
+            news_PList[x].set_position(80, 50)
+            QuizImgRoot.set_flag(SpriteFlag.INVISIBLE, True)
+            game.show_long_text((x+1) + "- The Heir of the XXXXX Empire got shot by a Serbian student!", DialogLayout.BOTTOM)
+            news_PList[x].set_flag(SpriteFlag.INVISIBLE, True)
+        game.show_long_text("One of these scraps should fit into this torn-out blank!",
+            DialogLayout.BOTTOM)
+        num = game.ask_for_number("What number was it? (Press 5 to inspect them again)", 1)
+    
+    if num == 1:
+        game.show_long_text("Seems correct! Let's go! I'm getting paid!", DialogLayout.BOTTOM)
+        game.over(True)
+    elif num == 2 or 3 or 4:
+        game.show_long_text("Seems correct! Let's go! I'm getting paid!", DialogLayout.BOTTOM)
+        num == 5
+    else:
+        game.show_long_text("That's not a valid number...", DialogLayout.BOTTOM)
+    
+    
+
+
+    
     
 
         
